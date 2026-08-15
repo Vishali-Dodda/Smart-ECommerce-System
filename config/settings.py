@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django_filters",
 
     "corsheaders",
+    "drf_spectacular",
 
     "rest_framework",
     "users",
@@ -129,6 +130,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # Internationalization
