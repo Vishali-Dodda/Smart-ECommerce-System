@@ -10,6 +10,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
 
+    category_name = serializers.CharField(
+        source="category.name",
+        read_only=True
+    )
+
     def validate_price(self, value):
         if value <= 0:
             raise serializers.ValidationError(
@@ -33,4 +38,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "description",
+            "price",
+            "stock",
+            "is_active",
+            "category",
+            "category_name",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "category_name",
+            "created_at",
+            "updated_at",
+        ]

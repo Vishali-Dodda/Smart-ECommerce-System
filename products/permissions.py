@@ -16,38 +16,39 @@ class IsAdminUser(BasePermission):
 
 class ProductPermission(BasePermission):
     """
-    Customers can view products.
-    Only admins can create, update, or delete products.
+    Anyone can view products.
+    Only authenticated admins can create, update, or delete products.
     """
 
     def has_permission(self, request, view):
 
-        # User must be authenticated
-        if not request.user or not request.user.is_authenticated:
-            return False
-
-        # Read operations are allowed for customers and admins
+        # Public read access
         if request.method in ["GET", "HEAD", "OPTIONS"]:
             return True
 
-        # Write operations are allowed only for admins
-        return request.user.is_staff
+        # Write operations require an authenticated admin
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_staff
+        )
+
 
 class CategoryPermission(BasePermission):
     """
-    Customers can view categories.
-    Only admins can create, update, or delete categories.
+    Anyone can view categories.
+    Only authenticated admins can create, update, or delete categories.
     """
 
     def has_permission(self, request, view):
 
-        # User must be authenticated
-        if not request.user or not request.user.is_authenticated:
-            return False
-
-        # Read operations are allowed for customers and admins
+        # Public read access
         if request.method in ["GET", "HEAD", "OPTIONS"]:
             return True
 
-        # Write operations are allowed only for admins
-        return request.user.is_staff
+        # Write operations require an authenticated admin
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_staff
+        )

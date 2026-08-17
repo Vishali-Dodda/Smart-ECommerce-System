@@ -23,7 +23,6 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     search_fields = [
         "name",
-        "description",
     ]
 
     ordering_fields = [
