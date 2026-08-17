@@ -10,6 +10,7 @@ import Register from "./pages/Register"
 import Login from "./pages/Login"
 import Account from "./pages/Account"
 import ProtectedRoute from "./components/ProtectedRoute"
+import Cart from "./pages/Cart"
 import "./App.css"
 
 function App() {
@@ -52,7 +53,17 @@ function App() {
               <Account />
             </ProtectedRoute>
             }
-/>
+          />
+
+          <Route
+            path="/cart"
+            element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+            }
+          />
+          
         </Routes>
 
       </AuthProvider>

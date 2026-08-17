@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import api from "../services/api"
+import { useAuth } from "../context/AuthContext"
 
 function Products() {
+  // =========================
+  // AUTHENTICATION
+  // =========================
+
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+
   // =========================
   // STATE
   // =========================
@@ -12,6 +21,10 @@ function Products() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+
+  // Cart button state
+  const [addingToCart, setAddingToCart] = useState(null)
+  const [addedToCart, setAddedToCart] = useState([])
 
   // Filters
   const [search, setSearch] = useState("")
@@ -141,6 +154,76 @@ function Products() {
     ordering,
     currentPage,
   ])
+
+
+  // =========================
+  // ADD TO CART
+  // =========================
+
+  const handleAddToCart = async (product) => {
+
+    // User must be logged in
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: {
+          from: "/products",
+        },
+      })
+
+      return
+    }
+
+
+    try {
+      setAddingToCart(product.id)
+
+      await api.post(
+        "/cart/items/",
+        {
+          product: product.id,
+          quantity: 1,
+        }
+      )
+
+
+      // Mark product as added
+      setAddedToCart((previous) => [
+        ...previous,
+        product.id,
+      ])
+
+
+      // Return button to normal after a short delay
+      setTimeout(() => {
+        setAddedToCart((previous) =>
+          previous.filter(
+            (id) => id !== product.id
+          )
+        )
+      }, 2000)
+
+
+    } catch (error) {
+
+      console.error(
+        "Failed to add product to cart:",
+        error
+      )
+
+      if (error.response?.data?.detail) {
+        alert(
+          error.response.data.detail
+        )
+      } else {
+        alert(
+          "Unable to add product to cart."
+        )
+      }
+
+    } finally {
+      setAddingToCart(null)
+    }
+  }
 
 
   // =========================
@@ -347,10 +430,10 @@ function Products() {
                     </p>
 
                     <Link
-                        to={`/products/${product.id}`}
-                        className="product-name-link"
+                      to={`/products/${product.id}`}
+                      className="product-name-link"
                     >
-                        <h3>{product.name}</h3>
+                      <h3>{product.name}</h3>
                     </Link>
 
                     <p className="product-description">
@@ -394,10 +477,20 @@ function Products() {
                     <button
                       className="add-cart-button"
                       disabled={
-                        product.stock === 0
+                        product.stock === 0 ||
+                        addingToCart === product.id
+                      }
+                      onClick={() =>
+                        handleAddToCart(product)
                       }
                     >
-                      Add to Cart
+                      {addingToCart === product.id
+                        ? "Adding..."
+                        : addedToCart.includes(
+                            product.id
+                          )
+                          ? "Added to Cart ✓"
+                          : "Add to Cart"}
                     </button>
 
                   </div>
