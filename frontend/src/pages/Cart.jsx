@@ -1,41 +1,28 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Link } from "react-router-dom"
-import api from "../services/api"
+import { useCart } from "../context/CartContext"
 
 function Cart() {
-  const [cart, setCart] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const {
+    cart,
+    loading,
+    updateQuantity,
+    removeItem,
+    clearCart,
+  } = useCart()
+
   const [error, setError] = useState("")
   const [updatingItem, setUpdatingItem] = useState(null)
 
-  const fetchCart = async () => {
-    try {
-      setLoading(true)
-      setError("")
 
-      const response = await api.get("/cart/")
+  // =========================
+  // UPDATE QUANTITY
+  // =========================
 
-      setCart(response.data)
-    } catch (error) {
-      console.error("Failed to fetch cart:", error)
-
-      if (error.response?.data?.detail) {
-        setError(error.response.data.detail)
-      } else {
-        setError("Unable to load your cart.")
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-
-  useEffect(() => {
-    fetchCart()
-  }, [])
-
-
-  const updateQuantity = async (itemId, newQuantity) => {
+  const handleUpdateQuantity = async (
+    itemId,
+    newQuantity
+  ) => {
     if (newQuantity < 1) {
       return
     }
@@ -44,21 +31,10 @@ function Cart() {
       setUpdatingItem(itemId)
       setError("")
 
-      const response = await api.patch(
-        `/cart/items/${itemId}/`,
-        {
-          quantity: newQuantity,
-        }
+      await updateQuantity(
+        itemId,
+        newQuantity
       )
-
-      setCart((previousCart) => ({
-        ...previousCart,
-        items: previousCart.items.map((item) =>
-          item.id === itemId
-            ? response.data
-            : item
-        ),
-      }))
 
     } catch (error) {
       console.error(
@@ -67,33 +43,31 @@ function Cart() {
       )
 
       if (error.response?.data?.detail) {
-        setError(error.response.data.detail)
+        setError(
+          error.response.data.detail
+        )
       } else {
         setError(
           "Unable to update product quantity."
         )
       }
+
     } finally {
       setUpdatingItem(null)
     }
   }
 
 
-  const removeItem = async (itemId) => {
+  // =========================
+  // REMOVE ITEM
+  // =========================
+
+  const handleRemoveItem = async (itemId) => {
     try {
       setUpdatingItem(itemId)
       setError("")
 
-      await api.delete(
-        `/cart/items/${itemId}/delete/`
-      )
-
-      setCart((previousCart) => ({
-        ...previousCart,
-        items: previousCart.items.filter(
-          (item) => item.id !== itemId
-        ),
-      }))
+      await removeItem(itemId)
 
     } catch (error) {
       console.error(
@@ -104,22 +78,22 @@ function Cart() {
       setError(
         "Unable to remove the item."
       )
+
     } finally {
       setUpdatingItem(null)
     }
   }
 
 
-  const clearCart = async () => {
+  // =========================
+  // CLEAR CART
+  // =========================
+
+  const handleClearCart = async () => {
     try {
       setError("")
 
-      await api.delete("/cart/clear/")
-
-      setCart((previousCart) => ({
-        ...previousCart,
-        items: [],
-      }))
+      await clearCart()
 
     } catch (error) {
       console.error(
@@ -133,6 +107,10 @@ function Cart() {
     }
   }
 
+
+  // =========================
+  // CALCULATE SUBTOTAL
+  // =========================
 
   const calculateSubtotal = () => {
     if (!cart?.items) {
@@ -155,7 +133,11 @@ function Cart() {
   }
 
 
-  if (loading) {
+  // =========================
+  // LOADING
+  // =========================
+
+  if (loading && !cart) {
     return (
       <main className="cart-page">
         <div className="cart-container">
@@ -166,21 +148,19 @@ function Cart() {
   }
 
 
-  if (error && !cart) {
+  // =========================
+  // CART ERROR
+  // =========================
+
+  if (!cart) {
     return (
       <main className="cart-page">
         <div className="cart-container">
 
           <div className="cart-error">
-            {error}
+            {error ||
+              "Unable to load your cart."}
           </div>
-
-          <button
-            className="retry-button"
-            onClick={fetchCart}
-          >
-            Try Again
-          </button>
 
         </div>
       </main>
@@ -188,9 +168,13 @@ function Cart() {
   }
 
 
-  const items = cart?.items || []
+  const items = cart.items || []
   const subtotal = calculateSubtotal()
 
+
+  // =========================
+  // EMPTY CART
+  // =========================
 
   if (items.length === 0) {
     return (
@@ -235,6 +219,10 @@ function Cart() {
   }
 
 
+  // =========================
+  // CART PAGE
+  // =========================
+
   return (
     <main className="cart-page">
 
@@ -243,11 +231,15 @@ function Cart() {
         {/* Heading */}
 
         <div className="cart-heading">
-          <h1>My Cart</h1>
+
+          <h1>
+            My Cart
+          </h1>
 
           <p>
             Review and manage your selected products.
           </p>
+
         </div>
 
 
@@ -262,7 +254,9 @@ function Cart() {
 
         <div className="cart-layout">
 
-          {/* Cart Items */}
+          {/* =========================
+              CART ITEMS
+          ========================= */}
 
           <section className="cart-items">
 
@@ -277,6 +271,7 @@ function Cart() {
 
               const isUpdating =
                 updatingItem === item.id
+
 
               return (
                 <article
@@ -314,17 +309,21 @@ function Cart() {
                       )}
                     </p>
 
+
+                    {/* Low Stock / Out of Stock */}
+
                     {product.stock === 0 && (
-                    <p className="cart-product-stock stock-unavailable">
+                      <p className="cart-product-stock stock-unavailable">
                         Out of stock
-                    </p>
+                      </p>
                     )}
 
-                    {product.stock > 0 && product.stock <= 5 && (
-                    <p className="cart-product-stock stock-low">
-                        Only {product.stock} left
-                    </p>
-                    )}
+                    {product.stock > 0 &&
+                      product.stock <= 5 && (
+                        <p className="cart-product-stock stock-low">
+                          Only {product.stock} left
+                        </p>
+                      )}
 
                   </div>
 
@@ -346,7 +345,7 @@ function Cart() {
                           item.quantity <= 1
                         }
                         onClick={() =>
-                          updateQuantity(
+                          handleUpdateQuantity(
                             item.id,
                             item.quantity - 1
                           )
@@ -355,19 +354,22 @@ function Cart() {
                         −
                       </button>
 
+
                       <span>
                         {item.quantity}
                       </span>
+
 
                       <button
                         type="button"
                         disabled={
                           isUpdating ||
+                          product.stock === 0 ||
                           item.quantity >=
                             product.stock
                         }
                         onClick={() =>
-                          updateQuantity(
+                          handleUpdateQuantity(
                             item.id,
                             item.quantity + 1
                           )
@@ -392,12 +394,15 @@ function Cart() {
                       )}
                     </strong>
 
+
                     <button
                       type="button"
                       className="remove-item-button"
                       disabled={isUpdating}
                       onClick={() =>
-                        removeItem(item.id)
+                        handleRemoveItem(
+                          item.id
+                        )
                       }
                     >
                       Remove
@@ -415,7 +420,7 @@ function Cart() {
             <button
               type="button"
               className="clear-cart-button"
-              onClick={clearCart}
+              onClick={handleClearCart}
             >
               Clear Cart
             </button>
@@ -423,13 +428,16 @@ function Cart() {
           </section>
 
 
-          {/* Cart Summary */}
+          {/* =========================
+              CART SUMMARY
+          ========================= */}
 
           <aside className="cart-summary">
 
             <h2>
               Cart Summary
             </h2>
+
 
             <div className="summary-row">
 

@@ -1653,3 +1653,13 @@ main {
   font-size: 13px;
   font-weight: 600;
 }
+
+/* =========================
+   CART COUNT
+========================= */
+
+.cart-count {
+  margin-left: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}

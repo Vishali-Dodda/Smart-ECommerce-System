@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import { AuthProvider } from "./context/AuthContext"
+import { CartProvider } from "./context/CartContext"
 
 import Navbar from "./components/Navbar"
 import Home from "./pages/Home"
@@ -11,62 +12,71 @@ import Login from "./pages/Login"
 import Account from "./pages/Account"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Cart from "./pages/Cart"
+
 import "./App.css"
+
 
 function App() {
   return (
     <BrowserRouter>
+
       <AuthProvider>
 
-        <Navbar />
+        <CartProvider>
 
-        <Routes>
-          <Route
-            path="/"
-            element={<Home />}
-          />
+          <Navbar />
 
-          <Route
-            path="/products"
-            element={<Products />}
-          />
+          <Routes>
 
-          <Route
-            path="/products/:id"
-            element={<ProductDetails />}
-          />
+            <Route
+              path="/"
+              element={<Home />}
+            />
 
-          <Route
-            path="/register"
-            element={<Register />}
-          />
+            <Route
+              path="/products"
+              element={<Products />}
+            />
 
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+            <Route
+              path="/products/:id"
+              element={<ProductDetails />}
+            />
 
-          <Route
-            path="/account"
-            element={
-            <ProtectedRoute>
-              <Account />
-            </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/register"
+              element={<Register />}
+            />
 
-          <Route
-            path="/cart"
-            element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-            }
-          />
-          
-        </Routes>
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+
+          </Routes>
+
+        </CartProvider>
 
       </AuthProvider>
+
     </BrowserRouter>
   )
 }

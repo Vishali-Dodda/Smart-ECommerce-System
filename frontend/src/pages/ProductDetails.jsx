@@ -3,13 +3,14 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 
 import api from "../services/api"
 import { useAuth } from "../context/AuthContext"
-
+import { useCart } from "../context/CartContext"
 
 function ProductDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
 
   const { isAuthenticated } = useAuth()
+  const { addToCart } = useCart()
 
   const [product, setProduct] = useState(null)
 
@@ -77,13 +78,7 @@ function ProductDetails() {
       setAddingToCart(true)
       setCartMessage("")
 
-      await api.post(
-        "/cart/items/",
-        {
-          product: product.id,
-          quantity: 1,
-        }
-      )
+      await addToCart(product.id, 1)
 
       setCartMessage(
         "Product added to your cart."

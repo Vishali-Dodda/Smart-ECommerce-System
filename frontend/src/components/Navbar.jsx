@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
 
 function Navbar() {
   const {
@@ -7,6 +8,10 @@ function Navbar() {
     isAuthenticated,
     logout,
   } = useAuth()
+
+  const {
+    cartCount,
+  } = useCart()
 
   return (
     <nav className="navbar">
@@ -49,6 +54,11 @@ function Navbar() {
 
         <Link to="/cart">
           Cart
+          {isAuthenticated && cartCount > 0 && (
+            <span className="cart-count">
+              ({cartCount})
+            </span>
+          )}
         </Link>
 
 

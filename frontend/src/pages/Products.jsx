@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import api from "../services/api"
 import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
 
 function Products() {
   // =========================
@@ -11,7 +12,7 @@ function Products() {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
-
+  const { addToCart } = useCart()
   // =========================
   // STATE
   // =========================
@@ -160,70 +161,53 @@ function Products() {
   // ADD TO CART
   // =========================
 
-  const handleAddToCart = async (product) => {
+const handleAddToCart = async (product) => {
 
-    // User must be logged in
-    if (!isAuthenticated) {
-      navigate("/login", {
-        state: {
-          from: "/products",
-        },
-      })
+  if (!isAuthenticated) {
+    navigate("/login", {
+      state: {
+        from: "/products",
+      },
+    })
 
-      return
-    }
-
-
-    try {
-      setAddingToCart(product.id)
-
-      await api.post(
-        "/cart/items/",
-        {
-          product: product.id,
-          quantity: 1,
-        }
-      )
-
-
-      // Mark product as added
-      setAddedToCart((previous) => [
-        ...previous,
-        product.id,
-      ])
-
-
-      // Return button to normal after a short delay
-      setTimeout(() => {
-        setAddedToCart((previous) =>
-          previous.filter(
-            (id) => id !== product.id
-          )
-        )
-      }, 2000)
-
-
-    } catch (error) {
-
-      console.error(
-        "Failed to add product to cart:",
-        error
-      )
-
-      if (error.response?.data?.detail) {
-        alert(
-          error.response.data.detail
-        )
-      } else {
-        alert(
-          "Unable to add product to cart."
-        )
-      }
-
-    } finally {
-      setAddingToCart(null)
-    }
+    return
   }
+
+  try {
+    setAddingToCart(product.id)
+
+    await addToCart(product.id, 1)
+
+    setAddedToCart((previous) => [
+      ...previous,
+      product.id,
+    ])
+
+    setTimeout(() => {
+      setAddedToCart((previous) =>
+        previous.filter(
+          (id) => id !== product.id
+        )
+      )
+    }, 2000)
+
+  } catch (error) {
+
+    console.error(
+      "Failed to add product to cart:",
+      error
+    )
+
+    if (error.response?.data?.detail) {
+      alert(error.response.data.detail)
+    } else {
+      alert("Unable to add product to cart.")
+    }
+
+  } finally {
+    setAddingToCart(null)
+  }
+}
 
 
   // =========================
