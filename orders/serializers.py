@@ -4,6 +4,7 @@ from .models import Order, OrderItem
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+
     product_name = serializers.CharField(
         source="product.name",
         read_only=True
@@ -11,6 +12,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
+
         fields = [
             "id",
             "product",
@@ -29,6 +31,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+
     items = OrderItemSerializer(
         many=True,
         read_only=True
@@ -36,8 +39,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
+
         fields = [
             "id",
+            "full_name",
+            "phone",
+            "address",
+            "city",
+            "state",
+            "pincode",
             "status",
             "total_amount",
             "items",
@@ -53,3 +63,24 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+        extra_kwargs = {
+            "full_name": {
+                "required": True
+            },
+            "phone": {
+                "required": True
+            },
+            "address": {
+                "required": True
+            },
+            "city": {
+                "required": True
+            },
+            "state": {
+                "required": True
+            },
+            "pincode": {
+                "required": True
+            },
+        }

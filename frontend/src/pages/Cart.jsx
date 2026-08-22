@@ -1,8 +1,10 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 
 function Cart() {
+  const navigate = useNavigate()
+
   const {
     cart,
     loading,
@@ -140,9 +142,15 @@ function Cart() {
   if (loading && !cart) {
     return (
       <main className="cart-page">
+
         <div className="cart-container">
-          <p>Loading your cart...</p>
+
+          <p>
+            Loading your cart...
+          </p>
+
         </div>
+
       </main>
     )
   }
@@ -155,6 +163,7 @@ function Cart() {
   if (!cart) {
     return (
       <main className="cart-page">
+
         <div className="cart-container">
 
           <div className="cart-error">
@@ -163,6 +172,7 @@ function Cart() {
           </div>
 
         </div>
+
       </main>
     )
   }
@@ -179,14 +189,19 @@ function Cart() {
   if (items.length === 0) {
     return (
       <main className="cart-page">
+
         <div className="cart-container">
 
           <div className="cart-heading">
-            <h1>My Cart</h1>
+
+            <h1>
+              My Cart
+            </h1>
 
             <p>
               Review the products you want to buy.
             </p>
+
           </div>
 
 
@@ -214,6 +229,7 @@ function Cart() {
           </div>
 
         </div>
+
       </main>
     )
   }
@@ -310,7 +326,7 @@ function Cart() {
                     </p>
 
 
-                    {/* Low Stock / Out of Stock */}
+                    {/* Low Stock */}
 
                     {product.stock === 0 && (
                       <p className="cart-product-stock stock-unavailable">
@@ -487,10 +503,14 @@ function Cart() {
             </div>
 
 
+            {/* Proceed to Checkout */}
+
             <button
               type="button"
               className="checkout-button"
-              disabled
+              onClick={() =>
+                navigate("/checkout")
+              }
             >
               Proceed to Checkout
             </button>

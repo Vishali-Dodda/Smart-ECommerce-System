@@ -12,26 +12,32 @@ import Login from "./pages/Login"
 import Account from "./pages/Account"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Cart from "./pages/Cart"
+import Checkout from "./pages/Checkout"
+import OrderDetails from "./pages/OrderDetails"
+import Orders from "./pages/Orders"
+import Categories from "./pages/Categories"
 
 import "./App.css"
-
 
 function App() {
   return (
     <BrowserRouter>
-
       <AuthProvider>
-
         <CartProvider>
 
           <Navbar />
 
           <Routes>
 
+            {/* Home */}
+
             <Route
               path="/"
               element={<Home />}
             />
+
+
+            {/* Products */}
 
             <Route
               path="/products"
@@ -43,6 +49,9 @@ function App() {
               element={<ProductDetails />}
             />
 
+
+            {/* Authentication */}
+
             <Route
               path="/register"
               element={<Register />}
@@ -53,6 +62,9 @@ function App() {
               element={<Login />}
             />
 
+
+            {/* Account */}
+
             <Route
               path="/account"
               element={
@@ -61,6 +73,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* Cart */}
 
             <Route
               path="/cart"
@@ -71,12 +86,46 @@ function App() {
               }
             />
 
+
+            {/* Checkout */}
+
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/orders/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderDetails />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Orders */}
+
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/categories"
+              element={<Categories />}
+            />
           </Routes>
 
         </CartProvider>
-
       </AuthProvider>
-
     </BrowserRouter>
   )
 }
