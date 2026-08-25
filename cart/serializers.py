@@ -5,6 +5,7 @@ from products.models import Product
 
 
 class CartProductSerializer(serializers.ModelSerializer):
+
     category_name = serializers.CharField(
         source="category.name",
         read_only=True
@@ -12,10 +13,12 @@ class CartProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
+
         fields = [
             "id",
             "name",
             "description",
+            "image_url",
             "price",
             "stock",
             "is_active",
@@ -24,6 +27,7 @@ class CartProductSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+
     product_details = CartProductSerializer(
         source="product",
         read_only=True
@@ -31,6 +35,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
+
         fields = [
             "id",
             "product",
@@ -44,6 +49,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         ]
 
     def validate_quantity(self, value):
+
         if value <= 0:
             raise serializers.ValidationError(
                 "Quantity must be greater than zero."
@@ -53,6 +59,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+
     items = CartItemSerializer(
         many=True,
         read_only=True
@@ -60,6 +67,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
+
         fields = [
             "id",
             "items",

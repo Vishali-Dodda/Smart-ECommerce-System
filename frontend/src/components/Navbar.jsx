@@ -65,7 +65,13 @@ function Navbar() {
         {isAuthenticated ? (
 
           <div className="navbar-account">
-
+            
+            {user?.is_staff && (
+              <Link to="/admin">
+                Admin
+              </Link>
+            )}
+            
             <Link
               to="/account"
               className="account-link"

@@ -17,6 +17,13 @@ import OrderDetails from "./pages/OrderDetails"
 import Orders from "./pages/Orders"
 import Categories from "./pages/Categories"
 
+import AdminRoute from "./components/AdminRoute"
+import AdminDashboard from "./pages/AdminDashboard"
+import AdminInventory from "./pages/AdminInventory"
+import AdminProducts from "./pages/AdminProducts"
+import AdminCategories from "./pages/AdminCategories"
+import AdminOrders from "./pages/AdminOrders"
+
 import "./App.css"
 
 function App() {
@@ -121,6 +128,51 @@ function App() {
             <Route
               path="/categories"
               element={<Categories />}
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/inventory"
+              element={
+                <AdminRoute>
+                  <AdminInventory />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/products"
+              element={
+                <AdminRoute>
+                  <AdminProducts />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/categories"
+              element={
+                <AdminRoute>
+                  <AdminCategories />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/orders"
+              element={
+                <AdminRoute>
+                  <AdminOrders />
+                </AdminRoute>
+              }
             />
           </Routes>
 

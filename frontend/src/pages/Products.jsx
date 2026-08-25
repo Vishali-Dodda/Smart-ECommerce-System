@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
+
 import api from "../services/api"
+import { useCart } from "../context/CartContext"
+
 
 function Products() {
+
+  // =========================
+  // CART
+  // =========================
+
+  const {
+    addToCart,
+  } = useCart()
+
 
   // =========================
   // URL SEARCH PARAMETERS
@@ -22,8 +34,16 @@ function Products() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
+  const [addingProduct, setAddingProduct] =
+    useState(null)
 
-  // Filters
+  const [cartMessage, setCartMessage] =
+    useState("")
+
+
+  // =========================
+  // FILTERS
+  // =========================
 
   const [search, setSearch] = useState("")
 
@@ -36,12 +56,20 @@ function Products() {
   const [ordering, setOrdering] = useState("")
 
 
-  // Pagination
+  // =========================
+  // PAGINATION
+  // =========================
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalProducts, setTotalProducts] = useState(0)
-  const [nextPage, setNextPage] = useState(null)
-  const [previousPage, setPreviousPage] = useState(null)
+
+  const [totalProducts, setTotalProducts] =
+    useState(0)
+
+  const [nextPage, setNextPage] =
+    useState(null)
+
+  const [previousPage, setPreviousPage] =
+    useState(null)
 
 
   // =========================
@@ -69,6 +97,7 @@ function Products() {
         )
 
       }
+
     }
 
     fetchCategories()
@@ -125,7 +154,7 @@ function Products() {
         }
 
 
-        // Search
+        // SEARCH
 
         if (search.trim()) {
 
@@ -135,7 +164,7 @@ function Products() {
         }
 
 
-        // Category
+        // CATEGORY
 
         if (category) {
 
@@ -145,7 +174,7 @@ function Products() {
         }
 
 
-        // Minimum price
+        // MINIMUM PRICE
 
         if (minPrice) {
 
@@ -155,7 +184,7 @@ function Products() {
         }
 
 
-        // Maximum price
+        // MAXIMUM PRICE
 
         if (maxPrice) {
 
@@ -165,7 +194,7 @@ function Products() {
         }
 
 
-        // Sorting
+        // SORTING
 
         if (ordering) {
 
@@ -184,14 +213,14 @@ function Products() {
           )
 
 
-        // Products
+        // PRODUCTS
 
         setProducts(
           response.data.results
         )
 
 
-        // Pagination
+        // PAGINATION
 
         setTotalProducts(
           response.data.count
@@ -235,6 +264,68 @@ function Products() {
     ordering,
     currentPage,
   ])
+
+
+  // =========================
+  // ADD TO CART
+  // =========================
+
+  const handleAddToCart = async (
+    product
+  ) => {
+
+    try {
+
+      setAddingProduct(product.id)
+      setCartMessage("")
+
+      await addToCart(
+        product.id,
+        1
+      )
+
+      setCartMessage(
+        `${product.name} added to cart.`
+      )
+
+      // Remove success message after 2 seconds
+
+      setTimeout(() => {
+
+        setCartMessage("")
+
+      }, 2000)
+
+    } catch (error) {
+
+      console.error(
+        "Failed to add product to cart:",
+        error
+      )
+
+      if (
+        error.response?.data?.detail
+      ) {
+
+        setError(
+          error.response.data.detail
+        )
+
+      } else {
+
+        setError(
+          "Unable to add product to cart."
+        )
+
+      }
+
+    } finally {
+
+      setAddingProduct(null)
+
+    }
+
+  }
 
 
   // =========================
@@ -310,7 +401,9 @@ function Products() {
       <section className="products-page">
 
 
-        {/* PAGE HEADING */}
+        {/* =========================
+            PAGE HEADING
+        ========================= */}
 
         <div className="section-heading">
 
@@ -326,12 +419,29 @@ function Products() {
         </div>
 
 
-        {/* FILTERS */}
+        {/* =========================
+            CART SUCCESS MESSAGE
+        ========================= */}
+
+        {cartMessage && (
+
+          <div className="cart-success-message">
+
+            {cartMessage}
+
+          </div>
+
+        )}
+
+
+        {/* =========================
+            FILTERS
+        ========================= */}
 
         <div className="product-filters">
 
 
-          {/* Search */}
+          {/* SEARCH */}
 
           <input
             type="text"
@@ -346,7 +456,7 @@ function Products() {
           />
 
 
-          {/* Category */}
+          {/* CATEGORY */}
 
           <select
             className="filter-select"
@@ -376,7 +486,7 @@ function Products() {
           </select>
 
 
-          {/* Minimum Price */}
+          {/* MINIMUM PRICE */}
 
           <input
             type="number"
@@ -391,7 +501,7 @@ function Products() {
           />
 
 
-          {/* Maximum Price */}
+          {/* MAXIMUM PRICE */}
 
           <input
             type="number"
@@ -406,7 +516,7 @@ function Products() {
           />
 
 
-          {/* Sorting */}
+          {/* SORTING */}
 
           <select
             className="filter-select"
@@ -447,7 +557,9 @@ function Products() {
         </div>
 
 
-        {/* TOTAL PRODUCTS */}
+        {/* =========================
+            TOTAL PRODUCTS
+        ========================= */}
 
         {!loading &&
           !error && (
@@ -461,7 +573,9 @@ function Products() {
           )}
 
 
-        {/* LOADING */}
+        {/* =========================
+            LOADING
+        ========================= */}
 
         {loading && (
 
@@ -472,7 +586,9 @@ function Products() {
         )}
 
 
-        {/* ERROR */}
+        {/* =========================
+            ERROR
+        ========================= */}
 
         {error && (
 
@@ -483,7 +599,9 @@ function Products() {
         )}
 
 
-        {/* PRODUCTS */}
+        {/* =========================
+            PRODUCTS
+        ========================= */}
 
         {!loading &&
           !error &&
@@ -500,18 +618,38 @@ function Products() {
                   >
 
 
-                    {/* PRODUCT IMAGE */}
+                    {/* =========================
+                        PRODUCT IMAGE
+                    ========================= */}
 
                     <div className="product-image">
 
-                      <span>
-                        No Image
-                      </span>
+                      {product.image_url ? (
+
+                        <img
+                          src={
+                            product.image_url
+                          }
+                          alt={product.name}
+                          className="product-image-img"
+                        />
+
+                      ) : (
+
+                        <div className="product-image-placeholder">
+
+                          No Image
+
+                        </div>
+
+                      )}
 
                     </div>
 
 
-                    {/* PRODUCT INFORMATION */}
+                    {/* =========================
+                        PRODUCT INFORMATION
+                    ========================= */}
 
                     <div className="product-info">
 
@@ -542,7 +680,9 @@ function Products() {
                       </p>
 
 
-                      {/* PRICE + STOCK */}
+                      {/* =========================
+                          PRICE + STOCK
+                      ========================= */}
 
                       <div className="product-bottom">
 
@@ -581,16 +721,28 @@ function Products() {
                       </div>
 
 
-                      {/* ADD TO CART */}
+                      {/* =========================
+                          ADD TO CART
+                      ========================= */}
 
                       <button
+                        type="button"
                         className="add-cart-button"
                         disabled={
-                          product.stock === 0
+                          product.stock === 0 ||
+                          addingProduct === product.id
+                        }
+                        onClick={() =>
+                          handleAddToCart(
+                            product
+                          )
                         }
                       >
 
-                        Add to Cart
+                        {addingProduct ===
+                        product.id
+                          ? "Adding..."
+                          : "Add to Cart"}
 
                       </button>
 
@@ -606,7 +758,9 @@ function Products() {
           )}
 
 
-        {/* NO PRODUCTS */}
+        {/* =========================
+            NO PRODUCTS
+        ========================= */}
 
         {!loading &&
           !error &&
@@ -619,7 +773,9 @@ function Products() {
           )}
 
 
-        {/* PAGINATION */}
+        {/* =========================
+            PAGINATION
+        ========================= */}
 
         {!loading &&
           !error &&

@@ -177,11 +177,19 @@ function ProductDetails() {
 
           {/* PRODUCT IMAGE */}
 
-          <div className="product-details-image">
-            <span>
-              No Image
-            </span>
-          </div>
+            <div className="product-details-image">
+              {product.image_url ? (
+                <img
+                  src={`http://localhost:5173${product.image_url}`}
+                  alt={product.name}
+                  className="product-details-image-img"
+                />
+              ) : (
+                <div className="product-details-image-placeholder">
+                  No Image
+                </div>
+              )}
+            </div>
 
 
           {/* PRODUCT INFORMATION */}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 
 function Cart() {
+
   const navigate = useNavigate()
 
   const {
@@ -25,11 +26,13 @@ function Cart() {
     itemId,
     newQuantity
   ) => {
+
     if (newQuantity < 1) {
       return
     }
 
     try {
+
       setUpdatingItem(itemId)
       setError("")
 
@@ -39,23 +42,29 @@ function Cart() {
       )
 
     } catch (error) {
+
       console.error(
         "Failed to update quantity:",
         error
       )
 
       if (error.response?.data?.detail) {
+
         setError(
           error.response.data.detail
         )
+
       } else {
+
         setError(
           "Unable to update product quantity."
         )
       }
 
     } finally {
+
       setUpdatingItem(null)
+
     }
   }
 
@@ -64,14 +73,19 @@ function Cart() {
   // REMOVE ITEM
   // =========================
 
-  const handleRemoveItem = async (itemId) => {
+  const handleRemoveItem = async (
+    itemId
+  ) => {
+
     try {
+
       setUpdatingItem(itemId)
       setError("")
 
       await removeItem(itemId)
 
     } catch (error) {
+
       console.error(
         "Failed to remove item:",
         error
@@ -82,7 +96,9 @@ function Cart() {
       )
 
     } finally {
+
       setUpdatingItem(null)
+
     }
   }
 
@@ -92,12 +108,15 @@ function Cart() {
   // =========================
 
   const handleClearCart = async () => {
+
     try {
+
       setError("")
 
       await clearCart()
 
     } catch (error) {
+
       console.error(
         "Failed to clear cart:",
         error
@@ -115,12 +134,14 @@ function Cart() {
   // =========================
 
   const calculateSubtotal = () => {
+
     if (!cart?.items) {
       return 0
     }
 
     return cart.items.reduce(
       (total, item) => {
+
         const price = Number(
           item.product_details.price
         )
@@ -129,6 +150,7 @@ function Cart() {
           total +
           price * item.quantity
         )
+
       },
       0
     )
@@ -140,7 +162,9 @@ function Cart() {
   // =========================
 
   if (loading && !cart) {
+
     return (
+
       <main className="cart-page">
 
         <div className="cart-container">
@@ -161,14 +185,18 @@ function Cart() {
   // =========================
 
   if (!cart) {
+
     return (
+
       <main className="cart-page">
 
         <div className="cart-container">
 
           <div className="cart-error">
+
             {error ||
               "Unable to load your cart."}
+
           </div>
 
         </div>
@@ -179,7 +207,9 @@ function Cart() {
 
 
   const items = cart.items || []
-  const subtotal = calculateSubtotal()
+
+  const subtotal =
+    calculateSubtotal()
 
 
   // =========================
@@ -187,7 +217,9 @@ function Cart() {
   // =========================
 
   if (items.length === 0) {
+
     return (
+
       <main className="cart-page">
 
         <div className="cart-container">
@@ -199,7 +231,7 @@ function Cart() {
             </h1>
 
             <p>
-              Review the products you want to buy.
+              Discover something you'll love.
             </p>
 
           </div>
@@ -240,11 +272,15 @@ function Cart() {
   // =========================
 
   return (
+
     <main className="cart-page">
 
       <div className="cart-container">
 
-        {/* Heading */}
+
+        {/* =========================
+            HEADING
+        ========================= */}
 
         <div className="cart-heading">
 
@@ -259,16 +295,23 @@ function Cart() {
         </div>
 
 
-        {/* Error */}
+        {/* =========================
+            ERROR
+        ========================= */}
 
         {error && (
+
           <div className="cart-error">
+
             {error}
+
           </div>
+
         )}
 
 
         <div className="cart-layout">
+
 
           {/* =========================
               CART ITEMS
@@ -290,67 +333,109 @@ function Cart() {
 
 
               return (
+
                 <article
                   className="cart-item"
                   key={item.id}
                 >
 
-                  {/* Product Image */}
+
+                  {/* =========================
+                      PRODUCT IMAGE
+                  ========================= */}
 
                   <div className="cart-product-image">
-                    <span>
-                      No Image
-                    </span>
+
+                    {product.image_url ? (
+
+                      <img
+                        src={
+                          `http://localhost:5173${product.image_url}`
+                        }
+                        alt={product.name}
+                        className="cart-product-image-img"
+                      />
+
+                    ) : (
+
+                      <span>
+                        No Image
+                      </span>
+
+                    )}
+
                   </div>
 
 
-                  {/* Product Information */}
+                  {/* =========================
+                      PRODUCT INFORMATION
+                  ========================= */}
 
                   <div className="cart-product-info">
 
                     <p className="cart-product-category">
+
                       {product.category_name}
+
                     </p>
 
+
                     <h2>
+
                       {product.name}
+
                     </h2>
 
+
                     <p className="cart-product-price">
+
                       ₹
                       {Number(
                         product.price
                       ).toLocaleString(
                         "en-IN"
                       )}
+
                     </p>
 
 
-                    {/* Low Stock */}
+                    {/* LOW STOCK */}
 
                     {product.stock === 0 && (
+
                       <p className="cart-product-stock stock-unavailable">
+
                         Out of stock
+
                       </p>
+
                     )}
+
 
                     {product.stock > 0 &&
                       product.stock <= 5 && (
-                        <p className="cart-product-stock stock-low">
-                          Only {product.stock} left
-                        </p>
-                      )}
+
+                      <p className="cart-product-stock stock-low">
+
+                        Only {product.stock} left
+
+                      </p>
+
+                    )}
 
                   </div>
 
 
-                  {/* Quantity */}
+                  {/* =========================
+                      QUANTITY
+                  ========================= */}
 
                   <div className="cart-quantity-section">
 
                     <span>
                       Quantity
                     </span>
+
 
                     <div className="quantity-controls">
 
@@ -399,15 +484,19 @@ function Cart() {
                   </div>
 
 
-                  {/* Item Total */}
+                  {/* =========================
+                      ITEM TOTAL
+                  ========================= */}
 
                   <div className="cart-item-total">
 
                     <strong>
+
                       ₹
                       {itemTotal.toLocaleString(
                         "en-IN"
                       )}
+
                     </strong>
 
 
@@ -427,16 +516,22 @@ function Cart() {
                   </div>
 
                 </article>
+
               )
+
             })}
 
 
-            {/* Clear Cart */}
+            {/* =========================
+                CLEAR CART
+            ========================= */}
 
             <button
               type="button"
               className="clear-cart-button"
-              onClick={handleClearCart}
+              onClick={
+                handleClearCart
+              }
             >
               Clear Cart
             </button>
@@ -462,10 +557,12 @@ function Cart() {
               </span>
 
               <span>
+
                 ₹
                 {subtotal.toLocaleString(
                   "en-IN"
                 )}
+
               </span>
 
             </div>
@@ -484,7 +581,8 @@ function Cart() {
             </div>
 
 
-            <div className="summary-divider"></div>
+            <div className="summary-divider">
+            </div>
 
 
             <div className="summary-total">
@@ -494,16 +592,20 @@ function Cart() {
               </span>
 
               <strong>
+
                 ₹
                 {subtotal.toLocaleString(
                   "en-IN"
                 )}
+
               </strong>
 
             </div>
 
 
-            {/* Proceed to Checkout */}
+            {/* =========================
+                CHECKOUT
+            ========================= */}
 
             <button
               type="button"
